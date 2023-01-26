@@ -124,23 +124,24 @@
 
         <div id="main" >
             <div class ="post_page_title_img" style="height: 25rem;background-image: url();background-position: center; background-repeat:no-repeat; background-size:cover;-moz-background-size:cover;overflow:hidden;" >
-                <a href="#" style="padding: 4rem 4rem 2rem 4rem ;"><h2 >Hello World</h2></a>
+                <a href="#" style="padding: 4rem 4rem 2rem 4rem ;"><h2 >firstCry</h2></a>
             </div>
             <!-- Post -->
             <div class="typo" style="padding: 3rem;">
-                <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+                <h2 id="1-项目整体思路"><a href="#1-项目整体思路" class="headerlink" title="1.项目整体思路"></a>1.项目整体思路</h2><p>​		项目的整体思路是先通过训练一个pytorch的模型，然后将.pth文件的模型先转换为onnx格式的模型，然后将onnx模型转换为ncnn的模型，最后使用opencv在sylixos上开发人脸识别和人脸检测的程序；</p>
+<h2 id="2-python模型训练部分"><a href="#2-python模型训练部分" class="headerlink" title="2.python模型训练部分"></a>2.python模型训练部分</h2><p>​		2.1  python模型的训练与转换主要过程是facenet模型-&gt;onnx-&gt;onnx_sim-&gt;ncnn；</p>
+<p>​		2.2  如果使用pycharm运行python代码的话，会自动提醒通过requirements.txt安装相应的库，遇到安装不上的情况用pip再安装一次就好；</p>
+<p>​		2.3  具体的训练与预测过程在readme.md里面有写；</p>
+<p>​		2.4  如果训练过程中出现提示cuda out of memory适当调小batchsize；</p>
+<p>​		2.5  模型挺难训练的，我用预训练模型跑了一整天，lfw数据集上的正确率才76点多，如果可以的话还是用实验室的服务器跑代码比较好；</p>
+<p>​		2.6  模型训练和验证完成后，使用py_to_onnx.py进行模型的转换，这里在python转成onnx的时候可能出了点问题，导致后续c++的模型没有验证成功，我后续有时间也会再研究；</p>
+<p>​		2.7  后续部署到sylixos上的时候，在window这转换模型的时候只需要转换到onnx_sim这步就行，剩余的在sylixos上编译ncnn后进行转换；</p>
+<p>​		2.8  参考文章与链接：</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/159379768">Pytorch分类模型转onnx以及onnx模型推理 - 知乎 (zhihu.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/498425043">模型部署入门教程（三）：PyTorch 转 ONNX 详解 - 知乎 (zhihu.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/Tencent/ncnn">GitHub - Tencent&#x2F;ncnn: ncnn is a high-performance neural network inference framework optimized for the mobile platform</a></p>
+<h2 id="3-ncnn编译与sylixos部分"><a href="#3-ncnn编译与sylixos部分" class="headerlink" title="3.ncnn编译与sylixos部分"></a>3.ncnn编译与sylixos部分</h2><p>​		主要参考ncnn的github上的教程，<a target="_blank" rel="noopener" href="https://blog.csdn.net/qq_40231159/article/details/111808792">(ncnn | Windows（VS2019）编译_Silence_Zzz的博客-CSDN博客_ncnn编译 win</a>（这个用的是nmake）我在linux上编译成功了，但是在windows中编译protobuf依赖的时候就会出现莫名奇妙的错误，如果编译不过的话直接到<a target="_blank" rel="noopener" href="https://github.com/Tencent/ncnn/releases">Releases · Tencent&#x2F;ncnn · GitHub</a>获取编译后的库即可，在sylixos上编译时遇到困难可以到这里找<a target="_blank" rel="noopener" href="https://bbs.sylixos.com/forum.php">1 - Powered by Discuz! (sylixos.com)</a>，sylixos相关的文档我也放在了文件夹中。sylixos的搭建可以参考这个<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1oL411W7Rp/?p=1&vd_source=82c59c84f8b8c57de62d9626d5d225a3">01.SylixOS开发环境的搭建_哔哩哔哩_bilibili</a></p>
+<h2 id="4-opencv进行人脸识别"><a href="#4-opencv进行人脸识别" class="headerlink" title="4.opencv进行人脸识别"></a>4.opencv进行人脸识别</h2><p>​		opencv部分我主要就做了对输入的两张图片进行相似度输出的功能，如果需要实现进一步的人脸检测的话可能需要自己找教程。这部分主要需要注意配置好c++的运行环境，把opencv库目录、ncnn库目录等库都包含进来，我在vs上做的时候主要参考这篇文章设置的链接：<a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_54583016/article/details/121424060">VS配置永久OpenCV（小萌轻松操作）：超细致_小胖子aba的博客-CSDN博客_vs配置opencv永久</a>，ncnn和vulkan的环境配置同理。如果有问题的话也可以参考opencv的官方文档。</p>
 
             </div>
 
@@ -203,8 +204,8 @@ $('.btn_click_load').click(function() {
 -->
 <script type="text/javascript">
     var disqus_config = function () {
-        this.page.url = 'http://example.com/2023/01/24/hello-world/';  // Replace PAGE_URL with your page's canonical URL variable
-        this.page.identifier = 'http://example.com/2023/01/24/hello-world/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        this.page.url = 'http://example.com/2023/01/25/firstCry/';  // Replace PAGE_URL with your page's canonical URL variable
+        this.page.identifier = 'http://example.com/2023/01/25/firstCry/'; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
     };
 </script>
 
